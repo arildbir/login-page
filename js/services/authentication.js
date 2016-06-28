@@ -6,28 +6,33 @@ myApp.factory('Authentication', ['$rootScope', '$location',
     login: function(user) {     //user comes from the registration-controller using Authentication.login($scope.user)
         
         firebase.auth().signInWithEmailAndPassword(user.email, user.password).catch(function(error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          // [START_EXCLUDE-errors]
-          if (errorCode === 'auth/wrong-password') {
-            alert('Wrong password.');
-          } else {
-            console.error(error);
-          }
-          // [END_EXCLUDE-errors]
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // [START_EXCLUDE-errors]
+            if (errorCode === 'auth/wrong-password') {
+                //alert('Wrong password.');
+                $rootScope.message = errorMessage;
+              } 
+            else {
+                //console.error(error);
+                $rootScope.message = errorMessage;
+              }
+          // [END error-handle]
            
         });
-        // [END authwithemail]
-         var authUser = firebase.auth().currentUser;
-            console.log(authUser);
+        // [END authentication-with-email]
+        
+        var currentUser = firebase.auth().currentUser; 
+            console.log(currentUser);
             var name, email, photoUrl, uid;
 
-            if (authUser != null) {
-              name = authUser.displayName;
-              email = authUser.email;
-              photoUrl = authUser.photoURL;
-                uid = authUser.uid; 
+            if (currentUser) {
+                $rootScope.currentUser = currentUser;
+              name = currentUser.displayName;
+              email = currentUser.email;
+              photoUrl = currentUser.photoURL;
+                uid = currentUser.uid; 
                 alert(uid);
                 $location.path(['/success']);
             }
@@ -44,7 +49,7 @@ myApp.factory('Authentication', ['$rootScope', '$location',
         return firebase.auth().signOut();
     },  //end of logout method
       
-    requireAuth: function () {  //method that uses Firebase authentication method. Returns error if authentication is not valid. If no email and password has been provided and you start up the factory. This error is cought by the myApp.run in app.js.
+    requireAuth: function () {  //method that uses Firebase authentication method. Returns error if authentication is not valid. If no email and password has been provided and you start up the factory. The error is cought by the myApp.run in app.js.
         return firebase.auth().currentUser;
     },  //end of requireAuthentication method
       
