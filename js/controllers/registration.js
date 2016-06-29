@@ -11,5 +11,8 @@ myApp.controller('RegistrationController', ['$scope', 'Authentication', function
   $scope.register = function() {    //register() is used in register.html
     Authentication.register($scope.user);
   };
+    $scope.returningUser = function() {
+        Authentication.returningUser($scope.user);
+    }
 
 }]);

@@ -3,7 +3,22 @@ myApp.factory('Authentication', ['$rootScope', '$location',
   function($rootScope, $location) {
 
   var myObject = {
-    login: function(user) {     //user comes from the registration-controller using Authentication.login($scope.user)
+      
+      returningUser (user) {
+            firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            // User is signed in.
+            $rootScope.message = 'A user is already here.'
+            $location.path(['/success']);
+          } else {
+            // No user is signed in.
+          }
+        });
+      
+        },
+      
+      
+      login: function(user) {     //user comes from the registration-controller using Authentication.login($scope.user)
         
         firebase.auth().signInWithEmailAndPassword(user.email, user.password).catch(function(error) {
             // Handle Errors here.
@@ -12,11 +27,14 @@ myApp.factory('Authentication', ['$rootScope', '$location',
             // [START_EXCLUDE-errors]
             if (errorCode === 'auth/wrong-password') {
                 //alert('Wrong password.');
-                $rootScope.message = errorMessage;
+                $rootScope.message = 'Sorry, wrong password';
               } 
+            if (errorCode === 'auth/user-not-found') {
+                $rootScope.message = 'Sorry, wrong email'
+            }
             else {
                 //console.error(error);
-                $rootScope.message = errorMessage;
+                $rootScope.message = errorCode;
               }
           // [END error-handle]
            
@@ -36,13 +54,6 @@ myApp.factory('Authentication', ['$rootScope', '$location',
                 alert(uid);
                 $location.path(['/success']);
             }
-            
-       
-        /*.then( function(user) {
-            $location.path(['/success']);      //location is an Angular function that redirects you to another set view
-        }) .catch( function(error) {
-            $rootScope.message = error.message;
-        });*/
     }, //end of login method 
 
     logout: function() {
@@ -68,10 +79,17 @@ myApp.factory('Authentication', ['$rootScope', '$location',
               console.error(error);
             }
             // [END_EXCLUDE]
+            
+            //set name
+            
+            
+            //set password
+            
+            
         });
           // [END createwithemail]
       
-        
+        //set password
         
         
         
