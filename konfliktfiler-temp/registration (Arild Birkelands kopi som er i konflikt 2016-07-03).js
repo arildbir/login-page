@@ -1,4 +1,4 @@
-myApp.controller('RegistrationController', ['$scope','Authentication', function($scope, Authentication) {
+myApp.controller('RegistrationController', ['$scope', 'Authentication', function($scope, Authentication) {
     
   $scope.login = function() {   //login() is used in login.html
     Authentication.login($scope.user);
@@ -11,5 +11,9 @@ myApp.controller('RegistrationController', ['$scope','Authentication', function(
   $scope.register = function() {    //register() is used in register.html
     Authentication.register($scope.user);
   };
-  
+    
+  $scope.returningUser = function() {
+        Authentication.returningUser($scope.user);
+    }
+
 }]);

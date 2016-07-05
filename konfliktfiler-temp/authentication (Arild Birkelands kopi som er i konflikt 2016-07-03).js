@@ -1,54 +1,52 @@
 //SERVICE
-myApp.factory('Authentication', ['$rootScope', '$location',
+myApp.factory('Authentication', ['$rootScope', '$location', 
   function($rootScope, $location) {
 
+
+      
+
+      
   var myObject = {
       
-      returningUser (ret) {
-          //myObject.logout();
-       //  var returningUser = firebase.auth().currentUser;   
-          console.log (ret.email);
-          alert (ret.email);
-          $location.path(['/success']);
-          
+      returningUser (user) {
+            firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            // User is signed in.
+            $rootScope.message = 'A user is already here.'
+            $location.path(['/success']);
+          } else {
+            // No user is signed in.
+          }
+        });
+      
         },
       
+      
       login: function(user) {     //user comes from the registration-controller using Authentication.login($scope.user)
-
-          firebase.auth().signInWithEmailAndPassword(user.email, user.password).catch(function(error) {
+        
+        firebase.auth().signInWithEmailAndPassword(user.email, user.password).catch(function(error) {
             // Handle Errors here.
             var errorCode = error.code;
             var errorMessage = error.message;
-            
             // [START_EXCLUDE-errors]
             if (errorCode === 'auth/wrong-password') {
-                $rootScope.message = 'Wrong password, sorry about that, dude!';
+                alert('Wrong password.');
+                errorMessage = 'Sorry, wrong password';
               } 
             if (errorCode === 'auth/user-not-found') {
-                $rootScope.message = "User not found, sorry about that, dude!";
+                errorMessage = 'Sorry, wrong email'
+                alert('Wrong email.');
             }
             else {
-                $rootScope.message = errorMessage;
+                alert(error);
+                errorMessage = errorCode;
               }
-                $rootScope.$apply();
           // [END error-handle]
-        })//.then(myObject.returningUser())
-            .then(function (result) {
-            console.log("AUTH OK " + result.providerId + " " + result.uid);
-              myObject.returningUser(result);
-        }, function (error) {
-            UtilityService.showToast("The app can't authenticate you, please re-login.", 'long', 'center');
-        })
-          
-          
-          
-        
+           $rootScope.message = errorMessage;
+        });
         // [END authentication-with-email]
-         
-
         
-          
-          /*  currentUser = firebase.auth().currentUser; 
+        var currentUser = firebase.auth().currentUser; 
             console.log(currentUser);
             var name, email, photoUrl, uid;
 
@@ -61,16 +59,10 @@ myApp.factory('Authentication', ['$rootScope', '$location',
                 alert(uid);
                 $location.path(['/success']);
             }
-          currentUser.$apply();*/
-          
     }, //end of login method 
-      
-      
-      
-      
+
     logout: function() {
         return firebase.auth().signOut();
-        $rootScope.messsage = '';
     },  //end of logout method
       
     requireAuth: function () {  //method that uses Firebase authentication method. Returns error if authentication is not valid. If no email and password has been provided and you start up the factory. The error is cought by the myApp.run in app.js.
