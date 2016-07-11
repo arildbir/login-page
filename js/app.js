@@ -1,6 +1,10 @@
 //MODULE
 var myApp = angular.module('myApp', ['ngRoute'])
 
+
+
+
+
 //we need a setup to stop users to type in /success to get to url of the loged in successfully page. This is done with $rootScope.$on witch listens to events of errors. The error is triggered in authentication.js where the factory has an autheticaion variable that checks for authentication with Firebase.
 
 
