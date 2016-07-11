@@ -6,23 +6,24 @@
 
     <link rel="stylesheet" href="css/style.css">
     
-    <script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
-<script>
-  // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyAnIeZaDrxhErLyd7OKt1OBIkpzE1s_zfg",
-    authDomain: "project-5473718736971437184.firebaseapp.com",
-    databaseURL: "https://project-5473718736971437184.firebaseio.com",
-    storageBucket: "project-5473718736971437184.appspot.com",
-  };
-  firebase.initializeApp(config);
-</script>
-    
+    <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyAnIeZaDrxhErLyd7OKt1OBIkpzE1s_zfg",
+        authDomain: "project-5473718736971437184.firebaseapp.com",
+        databaseURL: "https://project-5473718736971437184.firebaseio.com",
+        storageBucket: "project-5473718736971437184.appspot.com",
+      };
+        var app = firebase.initializeApp(config);
+        var database = app.database();
+        var auth = app.auth();
+        var storage = app.storage();
+    </script>
 
     <script src="js/lib/angular/angular.min.js"></script>
     <script src="js/lib/angular/angular-route.min.js"></script>
     <script src="js/lib/angular/angular-animate.min.js"></script>
-    
     
     <script src="js/app.js"></script>
     <script src="js/services/authentication.js"></script>

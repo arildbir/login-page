@@ -1,105 +1,87 @@
 //SERVICE
-myApp.factory('Authentication', ['$rootScope', '$location', 
-  function($rootScope, $location) {
+myApp.factory('Authentication', ['$rootScope', '$location','$timeout', function($rootScope, $location, $timeout) {
+    
+  var myObject = {  
+      
+      login: function(user) {     //user comes from the registration-controller using Authentication.login($scope.user)
+            firebase.auth().signInWithEmailAndPassword(user.email, user.password)
+            .then(function (result) {
+                console.log("AUTH OK " + result.provider + " " + result.uid);
 
-  var myObject = {
-    login: function(user) {     //user comes from the registration-controller using Authentication.login($scope.user)
+                $timeout(function () {
+                    $location.path(['/success']);
+                }, 0);
+
+                }, //end of function (result)
+                function (error) {
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    // [START_EXCLUDE-errors]
+                    if (errorCode === 'auth/wrong-password') {
+                        $rootScope.message = 'Wrong password, sorry about that, dude!';
+                      } 
+                    if (errorCode === 'auth/user-not-found') {
+                        $rootScope.message = "User not found, sorry about that, dude!";
+                    }
+                    else {
+                        $rootScope.message = errorMessage;
+                      }
+                    $rootScope.$apply();
+                }//end of function (error)
+            );//end of .then
+    }, //end of login
         
-        firebase.auth().signInWithEmailAndPassword(user.email, user.password).catch(function(error) {
-            // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            // [START_EXCLUDE-errors]
-            if (errorCode === 'auth/wrong-password') {
-                //alert('Wrong password.');
-                $rootScope.message = errorMessage;
-              } 
-            else {
-                //console.error(error);
-                $rootScope.message = errorMessage;
-              }
-          // [END error-handle]
-           
-        });
-        // [END authentication-with-email]
-        
-        var currentUser = firebase.auth().currentUser; 
-            console.log(currentUser);
-            var name, email, photoUrl, uid;
-
-            if (currentUser) {
-                $rootScope.currentUser = currentUser;
-              name = currentUser.displayName;
-              email = currentUser.email;
-              photoUrl = currentUser.photoURL;
-                uid = currentUser.uid; 
-                alert(uid);
-                $location.path(['/success']);
-            }
-            
-       
-        /*.then( function(user) {
-            $location.path(['/success']);      //location is an Angular function that redirects you to another set view
-        }) .catch( function(error) {
-            $rootScope.message = error.message;
-        });*/
-    }, //end of login method 
-
     logout: function() {
-        return firebase.auth().signOut();
-    },  //end of logout method
+            firebase.auth().signOut()
+            .then(function() {
+            // Sign-out successful.
+                $timeout(function () {
+                    $location.path(['/login']);
+                }, 0);
+                $rootScope.message = "You are now loged out."
+            }, //end of then
+            function(error) {
+            // An error happened.
+                $rootScope.message = errorMessage;
+                $rootScope.$apply();
+            }//end of error
+            );//end of then
+    }, //end of logout
+ 
+      writeUserData: function (userId, displayName, displayEmail) {
+          var user = {  email: displayEmail,
+                        name: displayName};
+          
+         console.log(user); database.ref('users/'+userId).set(user);
+          
+      },  //end of writeUserData
       
-    requireAuth: function () {  //method that uses Firebase authentication method. Returns error if authentication is not valid. If no email and password has been provided and you start up the factory. The error is cought by the myApp.run in app.js.
-        return firebase.auth().currentUser;
-    },  //end of requireAuthentication method
-      
-    register: function(user) {  //value of 'user' comes from the registration-controller using Authentication.register($scope.user);
-        
-        // Sign in with email and pass.
-        // [START createwithemail]
-        firebase.auth().createUserWithEmailAndPassword(user.email, user.password).catch(function(error) {
+      register: function(user) {     
+        auth.createUserWithEmailAndPassword(user.email, user.password)
+            .then (function (result) {
+                result.name=user.firstname;  
+                console.log('success, user added in createUser'); 
+                
+                myObject.writeUserData(result.uid, result.name, user.email);
+                return 'this is freakin awsome!'; 
+            })
+            .then (function (res){
+            console.log("yeeeeeeHaaaaaa");
+            console.log (res);
+            }
+           
+        ,function(error) {
             // Handle Errors here.
             var errorCode = error.code;
             var errorMessage = error.message;
-            // [START_EXCLUDE]
-            if (errorCode == 'auth/weak-password') {
-              alert('The password is too weak.');
-            } else {
-              console.error(error);
-            }
-            // [END_EXCLUDE]
-        });
-          // [END createwithemail]
-      
-        
-        
-        
-        
-        
-        
-        auth.$createUser({    //check Firebase for no duplicate email and register the user with a UID.
-        email: user.email,
-        password: user.password //KAN JEG HER FINNE UT HVA SOM RETURNERES FRA AUTH?? ER DET HER JEG FÅR regUser??
-      }).then( function(regUser) {   //authentication was a success, we get regUser from Firebase. .then is started: a function that will create a new child of the Firebase + users-url, so we can add more data to the UID that was just created.      //ER FUNCTION(REGUSER) EN ANNONYM FUNKSJON?
-          
-          var regRef = new Firebase(FIREBASE_URL + 'users') //we want to add UIDs data to the Firebase/appname/users/UID-url. We can do this by using regUser.child().
-        
-          .child(regUser.uid).set({     //.child is a method given by Firebase through regRef.child()
-              date: Firebase.ServerValue.TIMESTAMP,
-              regUser: regUser.uid,
-              firstname: user.firstname,
-              lastname: user.lastname,
-              email:  user.email
-          }); //end of child-method
-
-          //old code: $rootScope.message = "Hi " + user.firstname + ". Thank you for registering";  // end of .then method (subpart of register)
-          
-          myObject.login(user);
-          }).catch(function(error) {    //returns an error-message from Firebase, for instance if duplicate email.
             $rootScope.message = error.message;
-          }); //end of catch error-message
-    } // end of register-method
+            // ..
+        });
+    
+      } //end of register
+      
+      
   }; // end of myObject
       return myObject;
-      
-}]); //end of Authentication-factory
+    
+}]);    //closes the factory

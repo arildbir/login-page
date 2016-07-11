@@ -11,12 +11,12 @@ myApp.config(['$routeProvider', function($routeProvider) {
     })
     .when('/success', {
       templateUrl: 'views/success.html',
-      controller: 'SuccessController',
-      resolve: {
+      controller: 'SuccessController' /*,
+        resolve: {
           currentAuth: function(Authentication) {
               return Authentication.requireAuth();
           } //current Auth
-      } //resolve
+      } //resolve */
     })
     .otherwise({
       redirectTo: '/login'
